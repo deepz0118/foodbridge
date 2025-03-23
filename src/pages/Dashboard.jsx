@@ -1,43 +1,57 @@
-import React, { useState,useContext } from "react";
+import React, { useState, useEffect } from "react";
 import { ToastContainer, toast } from "react-toastify";
-import {FoodCard} from "./FoodCard";
 import "react-toastify/dist/ReactToastify.css";
 
 function Dashboard() {
-  const [posts, setPosts] = useState([]);
-  const [newRestaurantPost, setNewRestaurantPost] = useState({
+  const [posts, setPosts] = useState(() => {
+    const savedPosts = localStorage.getItem("restaurantPosts");
+    return savedPosts ? JSON.parse(savedPosts) : [];
+  });
+
+  const [newPost, setNewPost] = useState({
     restaurant: "",
     contact: "",
     foodCount: "",
     foodType: "Vegetarian",
     expiryDate: "",
-    details: ""
+    details: "",
+    lat: "",
+    lng: ""
   });
+
   const [showPopup, setShowPopup] = useState(false);
 
-  // Handle Adding New Restaurant Post
+  useEffect(() => {
+    localStorage.setItem("restaurantPosts", JSON.stringify(posts));
+  }, [posts]);
+
   const handleAddPost = () => {
     if (
-      newRestaurantPost.restaurant &&
-      newRestaurantPost.contact &&
-      newRestaurantPost.foodCount &&
-      newRestaurantPost.expiryDate
+      newPost.restaurant &&
+      newPost.contact &&
+      newPost.foodCount &&
+      newPost.expiryDate &&
+      newPost.lat &&
+      newPost.lng
     ) {
-      setPosts([
+      const updatedPosts = [
         ...posts,
         {
-          id: posts.length + 1,
-          ...newRestaurantPost,
-          status: "Available",
+          id: Date.now(),
+          ...newPost,
+          status: "Available"
         },
-      ]);
-      setNewRestaurantPost({
+      ];
+      setPosts(updatedPosts);
+      setNewPost({
         restaurant: "",
         contact: "",
         foodCount: "",
         foodType: "Vegetarian",
         expiryDate: "",
-        details: ""
+        details: "",
+        lat: "",
+        lng: ""
       });
       setShowPopup(true);
       toast.success("Restaurant details added successfully!", {
@@ -49,98 +63,69 @@ function Dashboard() {
       });
     }
   };
- 
+
   return (
-    <div
-      className="min-h-screen bg-cover bg-center py-8"
+    <div className="min-h-screen bg-cover bg-center py-10 flex justify-center items-center"
       style={{
         backgroundImage:
-          "url(https://img.freepik.com/free-vector/abstract-floral-design-hand-painted-teal-alcohol-ink-background_1048-20381.jpg)",
+          "url(https://img.freepik.com/free-vector/abstract-floral-design-hand-painted-teal-alcohol-ink-background_1048-20381.jpg)"
       }}
     >
-      <div className="container mx-auto bg-opacity-80 p-4 rounded-lg shadow-lg max-w-md" style={{ backgroundColor: "rgba(255, 255, 255, 0.5)" }}>
-        <h1 className="text-2xl font-bold text-teal-600 text-center mb-4">
+      <div className="backdrop-blur-md bg-white/30 p-10 rounded-3xl shadow-2xl w-full max-w-lg">
+        <h1 className="text-3xl font-bold text-teal-700 text-center mb-6">
           Restaurant Dashboard
         </h1>
-        <p className="text-md text-gray-700 text-center mb-4">
+        <p className="text-md text-gray-800 text-center mb-8">
           Add food donations that NGOs can claim.
         </p>
 
-        <div className="space-y-3 mb-7">
-          <input
-            type="text"
-            placeholder="Restaurant Name"
-            className="w-5/6 p-2 border rounded-lg bg-white bg-opacity-80"
-            value={newRestaurantPost.restaurant}
-            onChange={(e) =>
-              setNewRestaurantPost({
-                ...newRestaurantPost,
-                restaurant: e.target.value,
-              })
-            }
+        <div className="space-y-4">
+          <input type="text" placeholder="Restaurant Name"
+            className="w-full p-3 border border-gray-300 rounded-lg bg-white bg-opacity-90"
+            value={newPost.restaurant}
+            onChange={(e) => setNewPost({ ...newPost, restaurant: e.target.value })}
           />
-          <input
-            type="text"
-            placeholder="Contact Number"
-            className="w-5/6 p-2 border rounded-lg bg-white bg-opacity-80"
-            value={newRestaurantPost.contact}
-            onChange={(e) =>
-              setNewRestaurantPost({
-                ...newRestaurantPost,
-                contact: e.target.value,
-              })
-            }
+          <input type="text" placeholder="Contact Number"
+            className="w-full p-3 border border-gray-300 rounded-lg bg-white bg-opacity-90"
+            value={newPost.contact}
+            onChange={(e) => setNewPost({ ...newPost, contact: e.target.value })}
           />
-          <input
-            type="number"
-            placeholder="Food Count"
-            className="w-5/6 p-2 border rounded-lg bg-white bg-opacity-80"
-            value={newRestaurantPost.foodCount}
-            onChange={(e) =>
-              setNewRestaurantPost({
-                ...newRestaurantPost,
-                foodCount: e.target.value,
-              })
-            }
+          <input type="number" placeholder="Food Count"
+            className="w-full p-3 border border-gray-300 rounded-lg bg-white bg-opacity-90"
+            value={newPost.foodCount}
+            onChange={(e) => setNewPost({ ...newPost, foodCount: e.target.value })}
           />
-          <select
-            className="w-5/6 p-2 border rounded-lg bg-white bg-opacity-80"
-            value={newRestaurantPost.foodType}
-            onChange={(e) =>
-              setNewRestaurantPost({
-                ...newRestaurantPost,
-                foodType: e.target.value,
-              })
-            }
+          <select className="w-full p-3 border border-gray-300 rounded-lg bg-white bg-opacity-90"
+            value={newPost.foodType}
+            onChange={(e) => setNewPost({ ...newPost, foodType: e.target.value })}
           >
             <option value="Vegetarian">Vegetarian</option>
             <option value="Non-Vegetarian">Non-Vegetarian</option>
           </select>
-          <input
-            type="date"
-            className="w-5/6 p-2 border rounded-lg bg-white bg-opacity-80"
-            value={newRestaurantPost.expiryDate}
-            onChange={(e) =>
-              setNewRestaurantPost({
-                ...newRestaurantPost,
-                expiryDate: e.target.value,
-              })
-            }
+          <input type="date"
+            className="w-full p-3 border border-gray-300 rounded-lg bg-white bg-opacity-90"
+            value={newPost.expiryDate}
+            onChange={(e) => setNewPost({ ...newPost, expiryDate: e.target.value })}
           />
-          <textarea
-            placeholder="Additional Details"
-            className="w-5/6 p-2 border rounded-lg bg-white bg-opacity-80"
-            value={newRestaurantPost.details}
-            onChange={(e) =>
-              setNewRestaurantPost({
-                ...newRestaurantPost,
-                details: e.target.value,
-              })
-            }
+          <input type="text" placeholder="Latitude"
+            className="w-full p-3 border border-gray-300 rounded-lg bg-white bg-opacity-90"
+            value={newPost.lat}
+            onChange={(e) => setNewPost({ ...newPost, lat: e.target.value })}
+          />
+          <input type="text" placeholder="Longitude"
+            className="w-full p-3 border border-gray-300 rounded-lg bg-white bg-opacity-90"
+            value={newPost.lng}
+            onChange={(e) => setNewPost({ ...newPost, lng: e.target.value })}
+          />
+          <textarea placeholder="Additional Details"
+            className="w-full p-3 border border-gray-300 rounded-lg bg-white bg-opacity-90"
+            value={newPost.details}
+            onChange={(e) => setNewPost({ ...newPost, details: e.target.value })}
           ></textarea>
+
           <button
             onClick={handleAddPost}
-            className="w-5/6 p-2 bg-teal-500 text-white rounded-lg hover:bg-teal-600"
+            className="w-full p-3 bg-teal-600 text-white rounded-lg hover:bg-teal-700 shadow-md"
           >
             Add Food Post
           </button>
@@ -149,13 +134,15 @@ function Dashboard() {
 
       {/* Confirmation Popup */}
       {showPopup && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
-          <div className="bg-white p-4 rounded-lg shadow-lg max-w-sm text-center">
-            <h2 className="text-xl font-bold text-teal-600 mb-2">Success!</h2>
-            <p className="text-gray-700">Food details have been added successfully.</p>
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+          <div className="bg-white p-6 rounded-xl shadow-lg max-w-sm text-center">
+            <h2 className="text-2xl font-bold text-teal-600 mb-3">Success!</h2>
+            <p className="text-gray-700 mb-4">
+              Food details have been added successfully.
+            </p>
             <button
               onClick={() => setShowPopup(false)}
-              className="mt-3 px-4 py-2 bg-teal-500 text-white rounded-lg hover:bg-teal-600"
+              className="px-5 py-2 bg-teal-600 text-white rounded-lg hover:bg-teal-700 transition"
             >
               OK
             </button>

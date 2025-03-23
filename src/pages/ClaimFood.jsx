@@ -1,232 +1,202 @@
-// import React, { useContext, useState } from "react";
-// import { FoodCard } from "./FoodCard";
-// import { ToastContainer, toast } from "react-toastify";
-// import "react-toastify/dist/ReactToastify.css";
-
-// function ClaimFood() {
-//   const { posts, setPosts } = useContext(FoodCard);
-//   const [claimModal, setClaimModal] = useState(false);
-//   const [selectedPost, setSelectedPost] = useState(null);
-//   const [ngoDetails, setNgoDetails] = useState({ name: "", contact: "", note: "" });
-
-//   const handleClaim = () => {
-//     if (ngoDetails.name && ngoDetails.contact) {
-//       setPosts(
-//         posts.map((post) =>
-//           post.id === selectedPost.id ? { ...post, status: "Claimed" } : post
-//         )
-//       );
-//       setClaimModal(false);
-//       setNgoDetails({ name: "", contact: "", note: "" });
-//       toast.success("Food claimed successfully!", {
-//         position: toast.POSITION.TOP_CENTER,
-//       });
-//     } else {
-//       toast.error("Please fill out all fields!", {
-//         position: toast.POSITION.TOP_CENTER,
-//       });
-//     }
-//   };
-
-//   return (
-//     <div className="min-h-screen bg-cover bg-center py-12" style={{
-//       backgroundImage: "url(https://img.freepik.com/free-vector/abstract-floral-design-hand-painted-teal-alcohol-ink-background_1048-20381.jpg)",
-//     }}>
-//       <div className="container mx-auto px-6 bg-opacity-90 rounded-lg shadow-lg p-8">
-//         <h1 className="text-3xl font-bold text-teal-600 text-center mb-6">Claim Food</h1>
-//         <p className="text-lg text-gray-700 text-center mb-8">Claim available food donations from restaurants.</p>
-
-//         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-//           {posts.map((post) => (
-//             <div
-//               key={post.id}
-//               className={`p-6 rounded-lg shadow-lg transition-all duration-300 transform hover:scale-105 ${
-//                 post.status === "Claimed" ? "bg-gray-200" : "bg-teal-50"
-//               }`}
-//             >
-//               <h3 className="text-xl font-bold text-teal-600">{post.restaurant}</h3>
-//               <p className="text-gray-700">Food Type: {post.foodType}</p>
-//               <p className="text-gray-700">Food Count: {post.foodCount}</p>
-//               <p className={`font-semibold ${post.status === "Claimed" ? "text-red-500" : "text-green-500"}`}>{post.status}</p>
-//               {post.status === "Available" && (
-//                 <button
-//                   onClick={() => {
-//                     setSelectedPost(post);
-//                     setClaimModal(true);
-//                   }}
-//                   className="mt-4 bg-teal-500 text-white px-4 py-2 rounded-lg hover:bg-teal-600"
-//                 >
-//                   Claim Food
-//                 </button>
-//               )}
-//             </div>
-//           ))}
-//         </div>
-//       </div>
-
-//       {claimModal && (
-//         <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
-//           <div className="bg-white p-8 rounded-lg shadow-lg max-w-sm w-full">
-//             <h2 className="text-2xl font-bold text-teal-600 mb-4">Claim Food from {selectedPost?.restaurant}</h2>
-//             <input
-//               type="text"
-//               placeholder="NGO Name"
-//               className="w-full mb-4 p-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-teal-500"
-//               value={ngoDetails.name}
-//               onChange={(e) => setNgoDetails({ ...ngoDetails, name: e.target.value })}
-//             />
-//             <input
-//               type="text"
-//               placeholder="Contact Details"
-//               className="w-full mb-4 p-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-teal-500"
-//               value={ngoDetails.contact}
-//               onChange={(e) => setNgoDetails({ ...ngoDetails, contact: e.target.value })}
-//             />
-//             <textarea
-//               placeholder="Additional Notes (Optional)"
-//               className="w-full mb-4 p-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-teal-500"
-//               value={ngoDetails.note}
-//               onChange={(e) => setNgoDetails({ ...ngoDetails, note: e.target.value })}
-//             ></textarea>
-//             <div className="flex justify-end space-x-4">
-//               <button onClick={() => setClaimModal(false)} className="px-4 py-2 bg-gray-300 rounded-lg hover:bg-gray-400">
-//                 Cancel
-//               </button>
-//               <button onClick={handleClaim} className="px-4 py-2 bg-teal-500 text-white rounded-lg hover:bg-teal-600">
-//                 Claim
-//               </button>
-//             </div>
-//           </div>
-//         </div>
-//       )}
-
-//       <ToastContainer />
-//     </div>
-//   );
-// }
-
-// export default ClaimFood;
-
-
-import React, { useState } from "react";
-import {FoodCard} from "./FoodCard";
+import React, { useEffect, useState } from "react";
+import { BadgeCheck, AlertCircle, MapPin, UserCheck } from "lucide-react";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { Dialog } from "@headlessui/react";
 
 function ClaimFood() {
-  const [posts, setPosts] = useState([
-    {
-      id: 1,
-      restaurant: "Green Bites",
-      foodCount: "50",
-      foodType: "Vegetarian",
-      status: "Available",
-    },
-    {
-      id: 2,
-      restaurant: "City Grill",
-      foodCount: "30",
-      foodType: "Non-Vegetarian",
-      status: "Claimed",
-    },
-  ]);
+  const [restaurantPosts, setRestaurantPosts] = useState([]);
+  const [openModal, setOpenModal] = useState(false);
+  const [selectedPostId, setSelectedPostId] = useState(null);
+  const [ngoDetails, setNgoDetails] = useState({ name: "", contact: "" });
 
-  const [claimModal, setClaimModal] = useState(false);
-  const [selectedPost, setSelectedPost] = useState(null);
-  const [ngoDetails, setNgoDetails] = useState({ name: "", contact: "", note: "" });
+  useEffect(() => {
+    const storedPosts = JSON.parse(localStorage.getItem("restaurantPosts")) || [];
+    setRestaurantPosts(storedPosts);
+  }, []);
 
-  const handleClaim = () => {
-    if (ngoDetails.name && ngoDetails.contact) {
-      setPosts(
-        posts.map((post) =>
-          post.id === selectedPost.id ? { ...post, status: "Claimed" } : post
-        )
+  const updateLocalStorage = (updatedPosts) => {
+    localStorage.setItem("restaurantPosts", JSON.stringify(updatedPosts));
+    setRestaurantPosts(updatedPosts);
+  };
+
+  const handleClaim = (id) => {
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        const updatedPosts = restaurantPosts.map((post) =>
+          post.id === id
+            ? {
+                ...post,
+                status: "Claimed",
+                ngoLocation: {
+                  lat: position.coords.latitude,
+                  lng: position.coords.longitude,
+                },
+              }
+            : post
+        );
+        updateLocalStorage(updatedPosts);
+        toast.success("Food claimed successfully & location captured!");
+      },
+      () => {
+        toast.error("Location access denied!");
+      }
+    );
+  };
+
+  const handleReceivedClick = (id) => {
+    setSelectedPostId(id);
+    setOpenModal(true);
+  };
+
+  const confirmReceived = () => {
+    if (!ngoDetails.name || !ngoDetails.contact) {
+      toast.error("Please enter NGO name and contact!");
+      return;
+    }
+    const updatedPosts = restaurantPosts.map((post) =>
+      post.id === selectedPostId
+        ? { ...post, status: "Received", ngoDetails }
+        : post
+    );
+    updateLocalStorage(updatedPosts);
+    setOpenModal(false);
+    setNgoDetails({ name: "", contact: "" });
+    toast.success("Marked as received & authenticated!");
+  };
+
+  const getStatusBadge = (status) => {
+    if (status === "Available") {
+      return (
+        <span className="inline-flex items-center gap-1 px-3 py-1 text-sm font-medium rounded-full bg-green-100 text-green-800">
+          <BadgeCheck className="w-4 h-4" /> Available
+        </span>
       );
-      setClaimModal(false);
-      setNgoDetails({ name: "", contact: "", note: "" });
-      toast.success("Food claimed successfully!", {
-        position: toast.POSITION.TOP_CENTER,
-      });
-    } else {
-      toast.error("Please fill out all fields!", {
-        position: toast.POSITION.TOP_CENTER,
-      });
+    } else if (status === "Claimed") {
+      return (
+        <span className="inline-flex items-center gap-1 px-3 py-1 text-sm font-medium rounded-full bg-yellow-100 text-yellow-800">
+          <AlertCircle className="w-4 h-4" /> Claimed
+        </span>
+      );
+    } else if (status === "Received") {
+      return (
+        <span className="inline-flex items-center gap-1 px-3 py-1 text-sm font-medium rounded-full bg-blue-100 text-blue-800">
+          ✅ Received
+        </span>
+      );
     }
   };
 
   return (
-    <div className="min-h-screen bg-cover bg-center py-12" style={{
-      backgroundImage: "url(https://img.freepik.com/free-vector/abstract-floral-design-hand-painted-teal-alcohol-ink-background_1048-20381.jpg)",
-    }}>
-      <div className="container mx-auto px-6 bg-opacity-90 rounded-lg shadow-lg p-8">
-        <h1 className="text-3xl font-bold text-teal-600 text-center mb-6">Claim Food</h1>
-        <p className="text-lg text-gray-700 text-center mb-8">Claim available food donations from restaurants.</p>
+    <div
+      className="min-h-screen bg-cover bg-center relative p-10"
+      style={{
+        backgroundImage:
+          "url(https://img.freepik.com/free-vector/abstract-floral-design-hand-painted-teal-alcohol-ink-background_1048-20381.jpg)",
+      }}
+    >
+      {/* Light transparent overlay */}
+      <div className="absolute inset-0 bg-white/30"></div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {posts.map((post) => (
-            <div
-              key={post.id}
-              className={`p-6 rounded-lg shadow-lg transition-all duration-300 transform hover:scale-105 ${
-                post.status === "Claimed" ? "bg-gray-200" : "bg-teal-50"
-              }`}
-            >
-              <h3 className="text-xl font-bold text-teal-600">{post.restaurant}</h3>
-              <p className="text-gray-700">Food Type: {post.foodType}</p>
-              <p className="text-gray-700">Food Count: {post.foodCount}</p>
-              <p className={`font-semibold ${post.status === "Claimed" ? "text-red-500" : "text-green-500"}`}>{post.status}</p>
-              {post.status === "Available" && (
-                <button
-                  onClick={() => {
-                    setSelectedPost(post);
-                    setClaimModal(true);
-                  }}
-                  className="mt-4 bg-teal-500 text-white px-4 py-2 rounded-lg hover:bg-teal-600"
-                >
-                  Claim Food
-                </button>
-              )}
-            </div>
-          ))}
-        </div>
+      <div className="relative z-10">
+        <h1 className="text-4xl font-extrabold text-teal-800 text-center mb-10 drop-shadow-lg">
+          Available Food Donations 🍱
+        </h1>
+
+        {restaurantPosts.length === 0 ? (
+          <p className="text-center text-gray-800 text-lg">No food posts available yet.</p>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {restaurantPosts.map((post) => (
+              <div
+                key={post.id}
+                className="bg-white/80 p-6 rounded-2xl shadow-lg hover:shadow-2xl transition duration-300 transform hover:-translate-y-1 backdrop-blur-md"
+              >
+                <h2 className="text-2xl font-bold text-teal-700 mb-2">{post.restaurant}</h2>
+                <p className="text-gray-800 mb-1"><strong>📞 Contact:</strong> {post.contact}</p>
+                <p className="text-gray-800 mb-1"><strong>🍽️ Food Count:</strong> {post.foodCount}</p>
+                <p className="text-gray-800 mb-1"><strong>🥗 Food Type:</strong> {post.foodType}</p>
+                <p className="text-gray-800 mb-1"><strong>⏳ Expiry Date:</strong> {post.expiryDate}</p>
+                <p className="text-gray-800 mb-2"><strong>📝 Details:</strong> {post.details}</p>
+
+                <div className="flex justify-between items-center mt-4">
+                  {getStatusBadge(post.status)}
+                </div>
+
+                {post.ngoLocation && (
+                  <p className="text-sm text-gray-700 mt-2">
+                    <MapPin className="inline w-4 h-4 mr-1" />
+                    NGO Location: {post.ngoLocation.lat.toFixed(2)}, {post.ngoLocation.lng.toFixed(2)}
+                  </p>
+                )}
+
+                {post.ngoDetails && post.status === "Received" && (
+                  <p className="text-sm text-gray-700 mt-1">
+                    <UserCheck className="inline w-4 h-4 mr-1" /> Verified NGO: {post.ngoDetails.name}, {post.ngoDetails.contact}
+                  </p>
+                )}
+
+                <div className="mt-4 space-x-2">
+                  {post.status === "Available" && (
+                    <button
+                      onClick={() => handleClaim(post.id)}
+                      className="px-4 py-2 bg-teal-500 text-white rounded-lg hover:bg-teal-600"
+                    >
+                      Claim Food
+                    </button>
+                  )}
+                  {post.status === "Claimed" && (
+                    <button
+                      onClick={() => handleReceivedClick(post.id)}
+                      className="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600"
+                    >
+                      Confirm Received
+                    </button>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+        <ToastContainer />
       </div>
 
-      {claimModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
-          <div className="bg-white p-8 rounded-lg shadow-lg max-w-sm w-full">
-            <h2 className="text-2xl font-bold text-teal-600 mb-4">Claim Food from {selectedPost?.restaurant}</h2>
+      {/* Modal for NGO Authentication */}
+      <Dialog open={openModal} onClose={() => setOpenModal(false)} className="fixed inset-0 z-50 flex items-center justify-center p-4">
+        <Dialog.Panel className="bg-white/90 rounded-lg p-6 shadow-xl w-full max-w-md backdrop-blur-md">
+          <Dialog.Title className="text-lg font-bold mb-4">Confirm NGO Identity</Dialog.Title>
+          <div className="space-y-4">
             <input
               type="text"
               placeholder="NGO Name"
-              className="w-full mb-4 p-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-teal-500"
+              className="w-full p-2 border rounded-lg"
               value={ngoDetails.name}
               onChange={(e) => setNgoDetails({ ...ngoDetails, name: e.target.value })}
             />
             <input
               type="text"
-              placeholder="Contact Details"
-              className="w-full mb-4 p-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-teal-500"
+              placeholder="NGO Contact"
+              className="w-full p-2 border rounded-lg"
               value={ngoDetails.contact}
               onChange={(e) => setNgoDetails({ ...ngoDetails, contact: e.target.value })}
             />
-            <textarea
-              placeholder="Additional Notes (Optional)"
-              className="w-full mb-4 p-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-teal-500"
-              value={ngoDetails.note}
-              onChange={(e) => setNgoDetails({ ...ngoDetails, note: e.target.value })}
-            ></textarea>
-            <div className="flex justify-end space-x-4">
-              <button onClick={() => setClaimModal(false)} className="px-4 py-2 bg-gray-300 rounded-lg hover:bg-gray-400">
+            <div className="flex justify-end space-x-2 mt-4">
+              <button
+                onClick={() => setOpenModal(false)}
+                className="px-4 py-2 bg-gray-300 rounded-lg"
+              >
                 Cancel
               </button>
-              <button onClick={handleClaim} className="px-4 py-2 bg-teal-500 text-white rounded-lg hover:bg-teal-600">
-                Claim
+              <button
+                onClick={confirmReceived}
+                className="px-4 py-2 bg-green-500 text-white rounded-lg"
+              >
+                Confirm
               </button>
             </div>
           </div>
-        </div>
-      )}
-
-      <ToastContainer />
+        </Dialog.Panel>
+      </Dialog>
     </div>
   );
 }

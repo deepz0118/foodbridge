@@ -1,16 +1,23 @@
 import React from 'react';
-import { FaHandsHelping, FaRegHeart, FaStore } from 'react-icons/fa'; // Adding icons for stats
+import { useNavigate } from 'react-router-dom';
+import { FaHandsHelping, FaRegHeart, FaStore } from 'react-icons/fa';
+
 
 function Home() {
+  const navigate = useNavigate(); // Initialize navigate function
+
+  const handleDonateClick = () => {
+    navigate('/login'); // Navigate to donation form
+  };
+
   return (
     <div className="relative bg-gray-100" style={{ backgroundImage: 'url(https://img.freepik.com/free-vector/abstract-floral-design-hand-painted-teal-alcohol-ink-background_1048-20381.jpg)', backgroundSize: 'cover', backgroundPosition: 'center' }}>
-
-      {/* Hero Section */}
+      {/* Main Section */}
       <div className="flex items-center justify-between h-screen p-10">
         {/* Image Section */}
         <div className="w-1/2">
-          <img 
-            src="https://media.istockphoto.com/id/1224414210/vector/food-donation-and-charity.jpg?s=612x612&w=0&k=20&c=Zwz7H7M1-8d23Zpgz127eAaypBznKeGm05dXe80WzHs=" 
+          <img
+            src="https://media.istockphoto.com/id/1224414210/vector/food-donation-and-charity.jpg?s=612x612&w=0&k=20&c=Zwz7H7M1-8d23Zpgz127eAaypBznKeGm05dXe80WzHs="
             alt="Food Donation"
             className="w-full h-full object-cover rounded-lg shadow-lg"
           />
@@ -21,8 +28,13 @@ function Home() {
           <h1 className="text-3xl text-black font-bold mb-6">Bringing Food to Those Who Need It Most</h1>
           <p className="text-xl text-black mb-8">Join us in the fight against hunger and food waste.</p>
           <div>
-            <button className="bg-black text-white px-8 py-3 rounded-full shadow-lg hover:bg-teal-600 transition duration-300 ease-in-out mr-4">Donate Food</button>
-            <button className="bg-black text-white px-8 py-3 rounded-full shadow-lg hover:bg-orange-600 transition duration-300 ease-in-out">Join the Cause</button>
+            <button
+              className="bg-black text-white px-8 py-3 rounded-full shadow-lg hover:bg-orange-600 transition duration-300 ease-in-out"
+              onClick={handleDonateClick}
+            >
+              Donate Food
+            </button>
+            
           </div>
         </div>
       </div>
@@ -67,9 +79,6 @@ function Home() {
           </div>
         </div>
       </div>
-
-      
-
     </div>
   );
 }
